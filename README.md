@@ -1,7 +1,3 @@
-Here's a comprehensive GitHub README file for your scripts:
-
----
-
 # ELK Stack Setup Automation
 
 This repository contains scripts to automate the setup of the ELK (Elasticsearch, Logstash, Kibana) stack on Ubuntu or CentOS/Red Hat systems. It also includes scripts to install and configure Auditbeat and rsyslog to send logs to Logstash.
@@ -91,8 +87,20 @@ Contributions are welcome! Please fork this repository, make your changes, and s
 ## Screenshots
 
 ### ELK Stack Installation
+Elastisearch:
+![image](https://github.com/Squzu/ELK_Automation/assets/94438634/942e64fd-42e6-40ce-a0be-283a99730530)
 
-![ELK Stack Installation](screenshots/elk_installation.png)
+![image](https://github.com/Squzu/ELK_Automation/assets/94438634/e7a14154-c7f9-4631-99e5-35724f07b023)
+
+
+logstash:
+![image](https://github.com/Squzu/ELK_Automation/assets/94438634/9729765f-24c7-4918-839d-8739902c3637)
+
+Kibana:
+![image](https://github.com/Squzu/ELK_Automation/assets/94438634/55ee8cf7-5f00-4402-96a9-f925e97bcb8a)
+
+![image](https://github.com/Squzu/ELK_Automation/assets/94438634/c489c2d8-affe-4202-baf6-36aaff58659a)
+
 
 ### Auditbeat Configuration
 
@@ -101,5 +109,6 @@ Contributions are welcome! Please fork this repository, make your changes, and s
 ### rsyslog Configuration
 
 ![rsyslog Configuration](screenshots/rsyslog_configuration.png)
+
 
 ---
