@@ -26,16 +26,19 @@ To use these scripts, clone the repository and run the scripts with root privile
 
 2. **Run the ELK stack setup script:**
     ```bash
+    sudo chmod +x setup_elk_stack.sh
     sudo bash setup_elk_stack.sh
     ```
 
 3. **Run the Auditbeat installation and configuration script:**
     ```bash
+    sudo chmod +x setup_auditbeat.sh
     sudo bash setup_auditbeat.sh
     ```
 
 4. **Run the rsyslog configuration script:**
     ```bash
+    sudo chmod +x setup_rsyslog.sh
     sudo bash setup_rsyslog.sh
     ```
 
