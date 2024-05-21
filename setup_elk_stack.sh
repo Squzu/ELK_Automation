@@ -20,21 +20,6 @@
 # Note: Make sure to run this script with root privileges or using sudo.
 #
 
-# Function to display a loading bar
-function loading_bar() {
-    local pid=$!
-    local delay=0.5
-    local spinstr='|/-\'
-    while ps a | awk '{print $1}' | grep -q "$pid"; do
-        local temp=${spinstr#?}
-        printf " [%c]  " "$spinstr"
-        local spinstr=$temp${spinstr%"$temp"}
-        sleep $delay
-        printf "\b\b\b\b\b\b"
-    done
-    printf "    \b\b\b\b"
-}
-
 # Function to install packages on Ubuntu
 function install_ubuntu_packages() {
     sudo apt update
@@ -50,31 +35,29 @@ function install_centos_packages() {
 # Function to install ELK stack on Ubuntu
 function install_elk_ubuntu() {
     # Import Elasticsearch GPG key and add repository
-    wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /usr/share/keyrings/elasticsearch-keyring.gpg
-    echo "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list
+    wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch --no-check-certificate | sudo apt-key add -
+    echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-7.x.list
     sudo apt-get update
 
     # Install Elasticsearch, Kibana, and Logstash
-    sudo apt install -y elasticsearch kibana logstash &
-    loading_bar
+    sudo apt install -y elasticsearch kibana logstash
 }
 
 # Function to install ELK stack on CentOS/Red Hat
 function install_elk_centos() {
     # Import Elasticsearch GPG key and add repository
     sudo rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
-    echo "[elasticsearch-8.x]
-name=Elasticsearch repository for 8.x packages
-baseurl=https://artifacts.elastic.co/packages/8.x/yum
+    echo "[elasticsearch-7.x]
+name=Elasticsearch repository for 7.x packages
+baseurl=https://artifacts.elastic.co/packages/7.x/yum
 gpgcheck=1
 gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
 enabled=1
 autorefresh=1
-type=rpm-md" | sudo tee /etc/yum.repos.d/elasticsearch-8.x.repo
+type=rpm-md" | sudo tee /etc/yum.repos.d/elasticsearch-7.x.repo
 
     # Install Elasticsearch, Kibana, and Logstash
-    sudo yum install -y elasticsearch kibana logstash &
-    loading_bar
+    sudo yum install -y elasticsearch kibana logstash
 }
 
 # Error handling function
@@ -95,6 +78,42 @@ else
     echo "Unsupported operating system."
     exit 1
 fi
+
+# Check the operating system
+if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    OS=$NAME
+elif [ -f /etc/redhat-release ]; then
+    OS=$(head -n1 /etc/redhat-release)
+else
+    echo "Unsupported operating system."
+    exit 1
+fi
+
+# Function to disable firewall on CentOS/Red Hat
+function disable_firewall_centos() {
+    # Check if firewalld is installed
+    if ! command -v firewall-cmd &>/dev/null; then
+        echo "Firewalld is not installed. Skipping firewall disable."
+        return
+    fi
+
+    # Stop and disable firewalld
+    sudo systemctl stop firewalld
+    sudo systemctl disable firewalld
+    echo "Firewalld disabled."
+}
+
+# Disable firewall based on OS
+if [ "$OS" == "CentOS Linux" ]; then
+    disable_firewall_centos
+elif [ "$OS" == "Red Hat Enterprise Linux Server" ]; then
+    disable_firewall_centos
+else
+    echo "Firewall disable not supported on $OS."
+fi
+
+
 
 # Print script information
 echo "Script Name: setup_elk_stack.sh"
@@ -131,9 +150,9 @@ sudo sed -i 's/#network.host: 192.168.0.1/network.host: localhost/' /etc/elastic
 sudo sed -i 's/#http.port: 9200/http.port: 9200/' /etc/elasticsearch/elasticsearch.yml
 
 # Configure Kibana
-sudo sed -i 's/#server.port: 560/server.port: 5601/' /etc/kibana/kibana.yml
-sudo sed -i 's/#server.host: "localhost"/server.host: "localhost"/' /etc/kibana/kibana.yml
+sudo sed -i 's/#server.port: 5601/server.port: 5601/' /etc/kibana/kibana.yml
 IP=$(hostname -I | awk '{print $1}') && sudo sed -i "s/#server.host: \"localhost\"/server.host: \"$IP\"/" /etc/kibana/kibana.yml
+sudo sed -i 's/#elasticsearch\.hosts: \["http:\/\/localhost:9200"\]/elasticsearch\.hosts: \["http:\/\/localhost:9200"\]/' /etc/kibana/kibana.yml
 
 # Configure Logstash
 # Define the Logstash configuration
@@ -192,3 +211,4 @@ sudo systemctl start logstash
 sudo systemctl enable elasticsearch
 sudo systemctl enable kibana
 sudo systemctl enable logstash
+
