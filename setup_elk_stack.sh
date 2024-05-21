@@ -79,6 +79,8 @@ else
     exit 1
 fi
 
+#!/bin/bash
+
 # Check the operating system
 if [ -f /etc/os-release ]; then
     . /etc/os-release
@@ -104,16 +106,27 @@ function disable_firewall_centos() {
     echo "Firewalld disabled."
 }
 
+# Function to disable firewall on Ubuntu
+function disable_firewall_ubuntu() {
+    # Check if ufw is installed
+    if ! command -v ufw &>/dev/null; then
+        echo "UFW is not installed. Skipping firewall disable."
+        return
+    fi
+
+    # Disable ufw
+    sudo ufw disable
+    echo "UFW disabled."
+}
+
 # Disable firewall based on OS
-if [ "$OS" == "CentOS Linux" ]; then
+if [ "$OS" == "CentOS Linux" ] || [ "$OS" == "Red Hat Enterprise Linux Server" ]; then
     disable_firewall_centos
-elif [ "$OS" == "Red Hat Enterprise Linux Server" ]; then
-    disable_firewall_centos
+elif [ "$OS" == "Ubuntu" ]; then
+    disable_firewall_ubuntu
 else
     echo "Firewall disable not supported on $OS."
 fi
-
-
 
 # Print script information
 echo "Script Name: setup_elk_stack.sh"
