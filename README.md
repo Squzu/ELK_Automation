@@ -16,26 +16,26 @@ To use these scripts, clone the repository and run the scripts with root privile
 
 1. **Clone the repository:**
     ```bash
-    git clone https://github.com/squzu/elk-setup-script.git
-    cd elk-setup-script
+    git clone https://github.com/Squzu/ELK_Automation.git
+    cd ELK_Automation
     ```
 
 2. **Run the ELK stack setup script:**
     ```bash
     sudo chmod +x setup_elk_stack.sh
-    sudo bash setup_elk_stack.sh
+    sudo ./setup_elk_stack.sh
     ```
 
 3. **Run the Auditbeat installation and configuration script:**
     ```bash
     sudo chmod +x setup_auditbeat.sh
-    sudo bash setup_auditbeat.sh
+    sudo ./setup_auditbeat.sh
     ```
 
 4. **Run the rsyslog configuration script:**
     ```bash
     sudo chmod +x setup_rsyslog.sh
-    sudo bash setup_rsyslog.sh
+    sudo ./setup_rsyslog.sh
     ```
 
 ## Technologies Used
